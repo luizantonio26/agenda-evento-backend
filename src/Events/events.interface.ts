@@ -5,7 +5,6 @@ export interface eventData{
     data_inicio: Date,
     data_fim: Date,
     organizador: User,
-    convidados: User[]
 }
 
 export interface EventsRO {

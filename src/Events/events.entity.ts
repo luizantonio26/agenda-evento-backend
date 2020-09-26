@@ -1,6 +1,6 @@
-import { type } from "os";
+import { Invite } from "src/Invite/invite.entity";
 import { User } from "src/User/user.entity";
-import { Column, Entity, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity()
 export class Events{
@@ -19,8 +19,6 @@ export class Events{
     @ManyToOne(type=>User, organizador=> organizador.events)
     organizador: User
 
-    @ManyToMany(type=> User)
-    @JoinTable()
-    convidados: User[]
-
+    @OneToMany(type=>Invite, invite=> invite.events)
+    invite: Invite[]
 }

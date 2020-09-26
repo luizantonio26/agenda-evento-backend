@@ -89,7 +89,6 @@ export class EventsService{
           data_inicio: events.data_inicio,
           data_fim: events.data_fim,
           organizador: events.organizador,
-          convidados: events.convidados
         };
     
         return {events: eventsRO};
