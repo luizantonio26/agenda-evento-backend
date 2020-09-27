@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import {User} from '../User/user.entity'
 import { Events } from 'src/Events/events.entity';
 
@@ -10,6 +10,7 @@ export class Invite{
     @Column()
     status:string
 
+    @Index({unique:true})
     @ManyToOne(type=>User, user=>user.invite)
     user:User
 
