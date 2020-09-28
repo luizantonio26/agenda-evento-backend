@@ -30,4 +30,9 @@ export class InviteController{
     async confirmInvite(@Param() inviteId:number, @Body() data:any):Promise<Invite>{
         return this.inviteService.confirmInvite(inviteId, data)
     }
+
+    @Put("giveUp/event/:id")
+    async giveUp(@Param() eventId:number, @Body() data:any):Promise<Invite>{
+        return this.inviteService.giveUp(eventId, data)
+    }
 }

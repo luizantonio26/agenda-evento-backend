@@ -25,7 +25,6 @@ export class InviteService{
         const user = await this.user.findOne({
             where: {email}
         })
-        console.log(data)
         const [events] = await this.events.findByIds([eventId], {relations:['organizador']})
         if((user && events) && events.organizador.id !== user.id){
             const new_invite = new Invite();
@@ -45,7 +44,7 @@ export class InviteService{
                 }catch(exception){
                     if(exception.code === 'ER_DUP_ENTRY'){
                         throw new HttpException({message: 'usuario ja foi convidado para este evento'}, HttpStatus.BAD_REQUEST)
-                    }
+                    }   
                 }
             }
         }else{
@@ -54,7 +53,7 @@ export class InviteService{
     }
 
     async findWaitingInvites(userId:number):Promise<Invite[]>{
-        const [user] = await this.user.findByIds([userId])
+        //const [user] = await this.user.findByIds([userId])
 
         const qb = await getRepository(Invite).createQueryBuilder('invite')
         .innerJoinAndSelect('invite.events', 'events')
@@ -101,6 +100,19 @@ export class InviteService{
         
         qb.status = status
         await this.invite.update(inviteId, qb)
+        return qb
+    }
+
+    async giveUp(eventId:number, data:any):Promise<Invite>{
+        const {userId, status} = data
+        const [user] = await this.user.findByIds([userId])
+        const [events] = await this.events.findByIds([eventId])
+        let [qb] = await getRepository(Invite).find({
+            where:{events, user}
+        })
+        
+        qb.status = status
+        await this.invite.update(qb.id, qb)
         return qb
     }
 }

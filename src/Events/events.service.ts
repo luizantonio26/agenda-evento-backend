@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { validate } from "class-validator";
+import { Invite } from "src/Invite/invite.entity";
 import { User } from "src/User/user.entity";
 import { getRepository, Repository } from "typeorm";
 import { CreateEventsDto } from "./dto/create-events.dto";
@@ -15,7 +16,10 @@ export class EventsService{
         private readonly events: Repository<Events>,
 
         @InjectRepository(User)
-        private readonly user: Repository<User>
+        private readonly user: Repository<User>,
+
+        @InjectRepository(Invite)
+        private readonly invite: Repository<Invite>
     ){}
 
     async findOne(eventId:number): Promise<Events>{
@@ -25,11 +29,26 @@ export class EventsService{
 
     async findAll(userId: number): Promise<Events[]>{
         const [user] = await this.user.findByIds([userId])
-        return await getRepository(Events).createQueryBuilder('events')
+        let events = await getRepository(Events).createQueryBuilder('events')
         .innerJoinAndSelect("events.organizador", "organizador")
         .where("organizador.id = :userId", {userId})
         .andWhere("events.data_inicio > now()")
         .getMany()
+        let invite = await getRepository(Invite).createQueryBuilder('invite')
+        .innerJoinAndSelect("invite.events", "events")
+        .innerJoinAndSelect("events.organizador", "organizador")
+        .innerJoin("invite.user", "user")
+        .where("user.id = :userId",{userId})
+        .andWhere("invite.status = :status",{status:"aceito"})
+        .andWhere("events.data_inicio > now()")
+        .getMany()
+        invite.map(i=>{
+            events.push(i.events)
+        })
+
+        // console.log(events)
+        return events
+        
     }
 
     async create(dto:CreateEventsDto): Promise<EventsRO>{
