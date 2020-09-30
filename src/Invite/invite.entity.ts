@@ -11,10 +11,10 @@ export class Invite{
     status:string
 
     @Index({unique:true})
-    @ManyToOne(type=>User, user=>user.invite)
+    @ManyToOne(type=>User, user=>user.invite, {onDelete:"CASCADE"})
     user:User
 
-    @ManyToOne(type=>Events, events=>events.invite)
+    @ManyToOne(type=>Events, events=>events.invite, {onDelete:"CASCADE"})
     events:Events
 
 }

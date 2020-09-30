@@ -54,14 +54,15 @@ export class InviteService{
 
     async findWaitingInvites(userId:number):Promise<Invite[]>{
         //const [user] = await this.user.findByIds([userId])
-
         const qb = await getRepository(Invite).createQueryBuilder('invite')
         .innerJoinAndSelect('invite.events', 'events')
         .innerJoinAndSelect('invite.user', 'user')
         .innerJoinAndSelect('events.organizador', 'organizador')
         .where('invite.userId = :id', {id:userId})
-        .andWhere('invite.status', {status:"aguardando"})
+        .andWhere('invite.status = :status', {status:"aguardando"})
         .getMany()
+        console.log(qb)
+
         return qb
         // return await this.invite.find({
         //     where:{user, status:"aguardando"},

@@ -53,7 +53,6 @@ export class EventsService{
 
     async create(dto:CreateEventsDto): Promise<EventsRO>{
         const user_ = await this.user.findByIds([dto.organizador.id])
-        console.log(dto.data_inicio)
         if(user_){
             const new_events = new Events;
             
@@ -95,7 +94,6 @@ export class EventsService{
 
     async remove(eventId: number){
         const [qb] = await getRepository(Events).findByIds([eventId])
-        console.log("entrou")
         if(qb){
             await this.events.delete(qb)
         }
@@ -114,25 +112,25 @@ export class EventsService{
     }
 
     private async validaEvento(user:User, dto:UpdateEventsDto):Promise<boolean>{
-        const date_ini = new    Date(dto.data_inicio)
-            const date_end = new Date(dto.data_fim)
-            const events = await this.events.find({
-                where: {organizador:user}
-            })
-            const now = new Date(Date.now())
-            if(date_ini >= now && date_ini < date_end){
-                events.forEach(e => {
-                    const dt_ini = new Date(e.data_inicio)
-                    const dt_end = new Date(e.data_fim)
-                    
+        const date_ini = new Date(dto.data_inicio)
+        const date_end = new Date(dto.data_fim)
+        const events = await this.events.find({
+            where: {organizador:user}
+        })
+        const now = new Date(Date.now())
+        if(date_ini >= now && date_ini < date_end){
+            events.forEach(e => {
+                const dt_ini = new Date(e.data_inicio)
+                const dt_end = new Date(e.data_fim)
+                
     
-                    if(date_ini <= dt_end || date_end <= dt_ini || date_end < date_ini){
-                        return false;
-                    }
-                })
-                return true
-            }else{
-                throw new HttpException({message: 'a data do inicio do evento ja passou'}, HttpStatus.BAD_REQUEST);
-            }
+                if(date_ini <= dt_end || date_end <= dt_ini || date_end < date_ini){
+                    throw new HttpException({message: 'ja possui eventos cadastrado durante essa data e horario'}, HttpStatus.BAD_REQUEST)
+                }
+            })
+            return true
+        }else{
+            throw new HttpException({message: 'a data do inicio do evento ja passou'}, HttpStatus.BAD_REQUEST);
+        }
     }
 }
